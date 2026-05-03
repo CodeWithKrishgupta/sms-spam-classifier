@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMS Spam Awareness System</title>
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+/* ================= GLOBAL ================= */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+body{
+    background:#0b0f1a;
+    color:#fff;
+}
+html{
+    scroll-behavior:smooth;
+}
+section{
+    padding:60px 10%;
+}
+
+/* ================= NAVBAR ================= */
+header{
+    position:fixed;
+    width:100%;
+    top:0;
+    left:0;
+    background:#0d1323;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px 10%;
+    z-index:1000;
+}
+.logo{
+    font-size:22px;
+    font-weight:700;
+    color:#00c6ff;
+}
+nav ul{
+    display:flex;
+    list-style:none;
+}
+nav ul li{
+    margin-left:20px;
+}
+nav ul li a{
+    color:#fff;
+    text-decoration:none;
+    transition:0.3s;
+}
+nav ul li a:hover{
+    color:#00c6ff;
+}
+.menu-toggle{
+    display:none;
+    font-size:22px;
+    cursor:pointer;
+}
+
+/* ================= HERO ================= */
+.spam-checker {
+    margin-top: 20px;
+    text-align: left;
+}
+
+/* Label */
+.input-label {
+    font-size: 14px;
+    color: #aaa;
+    margin-bottom: 6px;
+    display: block;
+}
+
+/* Input box */
+.input-box {
+    position: relative;
+}
+
+/* Textarea */
+.input-box textarea {
+    width: 100%;
+    height: 130px;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #333;
+    background: #0f172a;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    resize: none;
+    transition: 0.3s;
+}
+
+/* Focus glow */
+.input-box textarea:focus {
+    border-color: #00c6ff;
+    box-shadow: 0 0 10px rgba(0,198,255,0.5);
+}
+
+/* Animated border */
+.focus-border {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(45deg,#00c6ff,#0072ff);
+    transition: 0.4s;
+}
+
+.input-box textarea:focus + .focus-border {
+    width: 100%;
+}
+
+/* Button */
+.check-btn {
+    width: 100%;
+    margin-top: 15px;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(45deg,#00c6ff,#0072ff);
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.check-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 15px rgba(0,198,255,0.6);
+}
+
+/* Loader */
+.loader {
+    display: none;
+    margin: 15px auto;
+    border: 4px solid #fff;
+    border-top: 4px solid #00c6ff;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    100% { transform: rotate(360deg); }
+}
+
+/* Result */
+.result-box {
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: bold;
+    text-align: center;
+    transition: 0.3s;
+}
+
+/* ================= GALLERY ================= */
+.gallery{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:15px;
+}
+.gallery img{
+    width:100%;
+    border-radius:10px;
+}
+.caption{
+    text-align:center;
+    font-size:14px;
+    margin-top:5px;
+}
+
+/* ================= PROTECTION ================= */
+.protection{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:20px;
+}
+
+/* ================= NEWS ================= */
+.news{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:20px;
+}
+
+/* ================= FOOTER ================= */
+footer{
+    background:#0d1323;
+    text-align:center;
+    padding:20px;
+}
+
+/* ================= CHATBOT ================= */
+.chat-btn{
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    background:#0072ff;
+    width:60px;
+    height:60px;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    cursor:pointer;
+    font-size:24px;
+}
+.chat-box{
+    position:fixed;
+    bottom:90px;
+    right:20px;
+    width:300px;
+    background:#111827;
+    border-radius:10px;
+    display:none;
+    flex-direction:column;
+}
+.chat-header{
+    padding:10px;
+    background:#0072ff;
+}
+.chat-body{
+    padding:10px;
+    height:200px;
+    overflow-y:auto;
+    font-size:14px;
+}
+.chat-input{
+    display:flex;
+}
+.chat-input input{
+    flex:1;
+    padding:10px;
+    border:none;
+}
+.chat-input button{
+    background:#0072ff;
+    border:none;
+    color:#fff;
+    padding:10px;
+}
+
+/* ================= MOBILE ================= */
+@media(max-width:768px){
+    nav ul{
+        position:absolute;
+        top:60px;
+        right:0;
+        background:#111827;
+        flex-direction:column;
+        width:200px;
+        display:none;
+    }
+    nav ul.active{
+        display:flex;
+    }
+    .menu-toggle{
+        display:block;
+    }
+    .spam-checker {
+    margin-top: 30px;
+}
+
+.spam-checker textarea {
+    width: 300px;
+    height: 100px;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    resize: none;
+}
+
+.spam-checker button {
+    display: block;
+    margin: 10px auto;
+    padding: 10px 20px;
+    background: #00d4ff;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#result {
+    margin-top: 10px;
+    font-size: 20px;
+}
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= HEADER ================= -->
+<header>
+<div class="logo">SMS Spam Awareness</div>
+<div class="menu-toggle"><i class="fas fa-bars"></i></div>
+<nav>
+<ul>
+<li><a href="#">Home</a></li>
+<li><a href="#features">Features</a></li>
+<li><a href="#awareness">Awareness</a></li>
+<li><a href="#protection">Protection</a></li>
+<li><a href="#contact">Contact</a></li>
+</ul>
+</nav>
+</header>
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+    <div class="hero-content">
+        <h1>🔐 Protect Yourself from SMS Spam</h1>
+        <p>Paste any message below and instantly detect if it's <b>Spam</b> or <b>Safe</b>.</p>
+
+        <div class="spam-checker">
+
+            <label class="input-label">📩 Enter SMS Message</label>
+
+            <div class="input-box">
+                <textarea id="messageInput" placeholder="Paste your message here..."></textarea>
+                <span class="focus-border"></span>
+            </div>
+
+            <button class="check-btn" onclick="checkSpam()">
+                🔍 Analyze Message
+            </button>
+
+            <!-- Loader -->
+            <div class="loader" id="loader"></div>
+
+            <!-- Result -->
+            <div id="result" class="result-box"></div>
+
+        </div>
+    </div>
+</section>
+<!-- ================= FEATURES ================= -->
+<section id="features">
+<h2>Features</h2>
+<div class="features">
+<div class="card">
+<i class="fas fa-robot"></i>
+<h3>AI Detection</h3>
+<p>Detect spam using machine learning algorithms.</p>
+</div>
+<div class="card">
+<i class="fas fa-bolt"></i>
+<h3>Real-time Analysis</h3>
+<p>Instant message checking system.</p>
+</div>
+<div class="card">
+<i class="fas fa-user"></i>
+<h3>User Friendly</h3>
+<p>Simple interface for everyone.</p>
+</div>
+</div>
+</section>
+
+<!-- ================= GALLERY ================= -->
+<section>
+<h2>Spam Examples</h2>
+<div class="gallery">
+<div>
+<img src="https://images.unsplash.com/photo-1584438784894-089d6a62b8fa">
+<div class="caption">Phishing SMS</div>
+</div>
+<div>
+<img src="https://images.unsplash.com/photo-1510511459019-5dda7724fd87">
+<div class="caption">Fake OTP Message</div>
+</div>
+<div>
+<img src="https://images.unsplash.com/photo-1581091215367-59ab6b8c41c4">
+<div class="caption">Lottery Scam</div>
+</div>
+<div>
+<img src="https://images.unsplash.com/photo-1587614382346-acf7c9aef3d8">
+<div class="caption">Fraud Alert SMS</div>
+</div>
+</div>
+</section>
+
+<!-- ================= PROTECTION ================= -->
+<section id="protection">
+<h2>Data Protection Tips</h2>
+<div class="protection">
+<div class="card"><i class="fas fa-lock"></i><p>Never share OTP</p></div>
+<div class="card"><i class="fas fa-link"></i><p>Avoid unknown links</p></div>
+<div class="card"><i class="fas fa-shield-alt"></i><p>Use spam filters</p></div>
+<div class="card"><i class="fas fa-mobile-alt"></i><p>Use trusted apps</p></div>
+</div>
+</section>
+
+<!-- ================= NEWS ================= -->
+<section>
+<h2>Latest Updates</h2>
+<div class="news">
+<div class="card">
+<h3>New phishing scams in 2026</h3>
+<p>Scammers are using fake bank messages.</p>
+</div>
+<div class="card">
+<h3>Rise in OTP fraud</h3>
+<p>Cases increased significantly this year.</p>
+</div>
+<div class="card">
+<h3>Govt warning</h3>
+<p>Beware of fake SMS alerts and links.</p>
+</div>
+</div>
+</section>
+
+<!-- ================= AWARENESS ================= -->
+<section id="awareness">
+<h2>SMS Spam Awareness</h2>
+<p><b>What is SMS Spam?</b><br>Unwanted messages sent to trick users.</p>
+<br>
+<p><b>Types:</b> OTP fraud, phishing links, lottery scams.</p>
+<br>
+<p><b>Harms:</b> Financial loss, identity theft, data leaks.</p>
+<br>
+<p><b>How attackers misuse data:</b> They collect personal info and use it for fraud activities.</p>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer id="contact">
+<p>Contact: support@spamaware.com</p>
+<p>© 2026 SMS Spam Awareness</p>
+</footer>
+
+<!-- ================= CHATBOT ================= -->
+<div class="chat-btn" onclick="toggleChat()"><i class="fas fa-comments"></i></div>
+
+<div class="chat-box" id="chatBox">
+<div class="chat-header">AI Assistant</div>
+<div class="chat-body" id="chatBody">
+<p><b>AI:</b> Hello! Ask me about spam.</p>
+</div>
+<div class="chat-input">
+<input type="text" id="userInput" placeholder="Type...">
+<button onclick="sendMessage()">Send</button>
+</div>
+</div>
+
+<script>
+// ================= MENU =================
+document.querySelector(".menu-toggle").onclick = () => {
+    document.querySelector("nav ul").classList.toggle("active");
+};
+
+// ================= CHAT =================
+function toggleChat(){
+    let box = document.getElementById("chatBox");
+    box.style.display = box.style.display === "flex" ? "none" : "flex";
+}
+
+// Add message UI
+function addMessage(text, sender){
+    let body = document.getElementById("chatBody");
+    let div = document.createElement("div");
+    div.className = sender === "user" ? "user-msg" : "bot-msg";
+    div.innerText = text;
+    body.appendChild(div);
+    body.scrollTop = body.scrollHeight;
+    return div;
+}
+
+function sendMessage(){
+    let input = document.getElementById("userInput");
+    let msg = input.value.trim();
+
+    if(msg === "") return;
+
+    addMessage(msg, "user");
+
+    // Typing effect
+    let typing = addMessage("Typing...", "bot");
+
+    // Smart logic + API call
+    handleBotResponse(msg, typing);
+
+    input.value = "";
+}
+
+// ================= SMART BOT + ML =================
+function handleBotResponse(msg, typingBox){
+    let lowerMsg = msg.toLowerCase();
+
+    // ===== QUICK REPLIES =====
+    if(lowerMsg.includes("hi") || lowerMsg.includes("hello")){
+        typingBox.innerText = "👋 Hello! Paste any SMS and I will check if it's spam.";
+        return;
+    }
+
+    if(lowerMsg.includes("what is spam")){
+        typingBox.innerText = "📢 Spam messages are fake or harmful messages that try to steal your data or money.";
+        return;
+    }
+
+    if(lowerMsg.includes("otp")){
+        typingBox.innerText = "🔐 Never share OTP. Even banks never ask for it.";
+        return;
+    }
+
+    if(lowerMsg.includes("report")){
+        typingBox.innerText = "🚨 You can report spam SMS in India by forwarding it to 1909.";
+        return;
+    }
+
+    // ===== 🔥 MAIN FEATURE: CALL FLASK MODEL =====
+    fetch("/predict", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message: msg })
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        if(data.result === "Spam"){
+            typingBox.innerText = "⚠️ This message is SPAM!\nAvoid clicking links or sharing personal info.";
+        } else {
+            typingBox.innerText = "✅ This message looks SAFE.";
+        }
+
+    })
+    .catch(error => {
+        typingBox.innerText = "❌ Server error. Please try again.";
+        console.log(error);
+    });
+}
+
+// ================= BUTTON SPAM CHECK =================
+function checkSpam() {
+    const message = document.getElementById("messageInput").value;
+    const resultBox = document.getElementById("result");
+
+    if (message.trim() === "") {
+        resultBox.innerText = "Please enter a message!";
+        return;
+    }
+
+    resultBox.innerText = "Checking...";
+
+    fetch("/predict", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message: message })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.result === "Spam") {
+            resultBox.innerText = "⚠️ This is SPAM!";
+            resultBox.style.color = "red";
+        } else {
+            resultBox.innerText = "✅ This is NOT Spam.";
+            resultBox.style.color = "lightgreen";
+        }
+    })
+    .catch(error => {
+        resultBox.innerText = "Error connecting to server!";
+        console.log(error);
+    });
+}
+
+// ================= SCROLL ANIMATION =================
+window.addEventListener("scroll", () => {
+    document.querySelectorAll(".card").forEach(el => {
+        let pos = el.getBoundingClientRect().top;
+        if(pos < window.innerHeight){
+            el.style.opacity = 1;
+            el.style.transform = "translateY(0)";
+        }
+    });
+});
+function checkSpam() {
+    const message = document.getElementById("messageInput").value;
+    const resultBox = document.getElementById("result");
+    const loader = document.getElementById("loader");
+
+    if (message.trim() === "") {
+        resultBox.innerText = "⚠️ Please enter a message!";
+        return;
+    }
+
+    loader.style.display = "block";
+    resultBox.innerText = "";
+
+    fetch("/predict", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message: message })
+    })
+    .then(res => res.json())
+    .then(data => {
+        loader.style.display = "none";
+
+        if (data.result === "Spam") {
+            resultBox.innerText = "⚠️ This is SPAM!";
+            resultBox.style.background = "rgba(255,0,0,0.1)";
+            resultBox.style.color = "#ff4d4d";
+        } else {
+            resultBox.innerText = "✅ This is SAFE.";
+            resultBox.style.background = "rgba(0,255,0,0.1)";
+            resultBox.style.color = "#00ff99";
+        }
+    })
+    .catch(() => {
+        loader.style.display = "none";
+        resultBox.innerText = "❌ Server error!";
+    });
+}
+</script>
+
+</body>
+</html>
